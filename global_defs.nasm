@@ -51,38 +51,25 @@ print_hex_digit:                        ; arg1: digit
     print_str hex_digit_char, 1                    ; print(rax)
     pop rax
     ret
-print_hex:                              ; arg1: num, arg2: len
+print_hex:                              ; arg1: *num, arg2: size (bytes)
     push rbx
     push rdx
-    mov rbx, arg1
-    ; and rbx, byte 0xf
-    ; shr rcx, 4
-    mov rdx, 0
+    mov rbx, arg2                       ; rbx = num + size - 1
+    add rbx, arg1                       
+    dec rbx                             
+    mov rdx, arg1                       ; rdx = num
+    mov arg1, rbx                       ; num = rbx
     .lp:
-        ; push arg1
-        ; ; print_str test_str, 4
-        ; mov arg1, rcx         ; print(rdx, 1)
-        ; call print_hex_digit
-        ; shr byte [rcx], 4                 ; rdx &= 0b1111
-        ; mov arg1, rcx                ; print(rdx, 1)
-        ; call print_hex_digit
-        ; pop arg1
-        ; shr byte [rcx], 4
-        ; add byte [r10], byte 48
-        ; mov rcx, current_digit
-        ; mov rcx, [rax]
-        mov arg1, rbx
-        call print_hex_digit
-        shr byte [rbx], 4
-        ; and byte [rbx], byte 0xf
-        mov arg1, rbx
-        call print_hex_digit
-        inc rbx
-        add rdx, 2                         ; rcx ++
-        cmp rdx, arg2                   ; if rcx <= arg1:
-        jge .endlp                       ;   break
+        ror byte [rbx], 4               ; rbx >>> 4
+        call print_hex_digit            ; print_hex_digit(num)
+        ror byte [rbx], 4               ; rbx >>> 4
+        call print_hex_digit            ; print_hex_digit(num)
+        dec rbx                         ; rbx --
+        dec arg1                        ; num --
+        cmp rbx, rdx                    ; if rbx < rdx:
+        jl .endlp                       ;   break
         jmp .lp                         ; continue
     .endlp:
     pop rdx
-    pop rcx
+    pop rbx
     ret
