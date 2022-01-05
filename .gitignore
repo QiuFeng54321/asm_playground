@@ -1,7 +1,5 @@
-/a.out
-/fib
-/fib.o
-/global_defs.o
-/helloworld
-/helloworld.o
-/tempCodeRunnerFile.nasm
+*
+!*.*
+*.out
+*.o
+tempCodeRunnerFile.*
