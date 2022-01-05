@@ -9,11 +9,13 @@ default rel
         push arg1
         push arg2
         push arg3
+        push rcx
         mov rax, print
         mov arg1, 1
         mov arg2, %1
         mov arg3, %2
         syscall
+        pop rcx
         pop arg3
         pop arg2
         pop arg1
