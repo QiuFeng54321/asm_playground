@@ -2,7 +2,7 @@
 
 section .data
 hi db 'hi', 0xa
-hex dq 0xf24de600
+hex dq 0xf24de6
 hex_digit db 0xd
 
 section .text

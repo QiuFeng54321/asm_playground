@@ -33,14 +33,14 @@ section .bss
     hex_digit_char resb 1
 
 section .text
-print_hex_digit:                        ; arg1: digit
+print_hex_digit:                        ; arg1: *digit
     push rax
-    mov rax, [arg1]          ; rax = *arg1
+    mov rax, [arg1]                     ; rax = *arg1
     and rax, 0xf
-    cmp rax, 10                        ; if arg1 >= 10:
-    jge .af                             ;   goto .af
+    cmp rax, 10                         ; if arg1 >= 10:
+    jge .alphabet                       ;   goto .af
     jmp .digit                          ; else goto .digit
-    .af:
+    .alphabet:
         add rax, [W_char]               ; rax += W_char (87)
         jmp .endif                      ; goto .endif
     .digit:
@@ -52,24 +52,19 @@ print_hex_digit:                        ; arg1: digit
     pop rax
     ret
 print_hex:                              ; arg1: *num, arg2: size (bytes)
-    push rbx
     push rdx
-    mov rbx, arg2                       ; rbx = num + size - 1
-    add rbx, arg1                       
-    dec rbx                             
-    mov rdx, arg1                       ; rdx = num
-    mov arg1, rbx                       ; num = rbx
+    mov rdx, arg1                       ; rdx = arg1
+    add arg1, arg2                      ; arg1 += arg2 - 1
+    dec arg1
     .lp:
-        ror byte [rbx], 4               ; rbx >>> 4
-        call print_hex_digit            ; print_hex_digit(num)
-        ror byte [rbx], 4               ; rbx >>> 4
-        call print_hex_digit            ; print_hex_digit(num)
-        dec rbx                         ; rbx --
-        dec arg1                        ; num --
-        cmp rbx, rdx                    ; if rbx < rdx:
+        ror byte [arg1], 4              ; *arg1 >>> 4
+        call print_hex_digit            ; print_hex_digit(arg1)
+        ror byte [arg1], 4              ; *arg1 >>> 4
+        call print_hex_digit            ; print_hex_digit(arg1)
+        dec arg1                        ; arg1 --
+        cmp arg1, rdx                   ; if arg1 < rdx:
         jl .endlp                       ;   break
         jmp .lp                         ; continue
     .endlp:
     pop rdx
-    pop rbx
     ret
