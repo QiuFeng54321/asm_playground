@@ -19,6 +19,15 @@ default rel
         pop arg1
         pop rax
 %endmacro
+%macro print_hex 2
+        push arg1
+        push arg2
+        mov arg1, %1
+        mov arg2, %2
+        call _print_hex
+        pop arg2
+        pop arg1
+%endmacro
 %macro exit 1
     mov rax, exit_
     mov rdi, %1
@@ -34,24 +43,19 @@ section .bss
 
 section .text
 print_hex_digit:                        ; arg1: *digit
-    push rax
-    mov rax, [arg1]                     ; rax = *arg1
-    and rax, 0xf
-    cmp rax, 10                         ; if arg1 >= 10:
-    jge .alphabet                       ;   goto .af
-    jmp .digit                          ; else goto .digit
-    .alphabet:
-        add rax, [W_char]               ; rax += W_char (87)
-        jmp .endif                      ; goto .endif
-    .digit:
-        add rax, [zero_char]            ; rax += zero_char
+    push rbx
+    mov rbx, [arg1]                     ; *hex_digit_char = *arg1
+    mov [hex_digit_char], rbx
+    pop rbx
+    and [hex_digit_char], byte 0xf      ; hex_digit_char &= 0b1111
+    cmp [hex_digit_char], byte 10       ; if hex_digit_char < 10:
+    jl .endif                           ;   goto .endif
+    add [hex_digit_char], byte 39       ; hex_digit_char += 39 ('W' - '0')
     .endif:
-    ; and rax, 0fh
-    mov [hex_digit_char], rax
-    print_str hex_digit_char, 1                    ; print(rax)
-    pop rax
+        add [hex_digit_char], byte '0'  ; hex_digit_char += '0'
+    print_str hex_digit_char, 1         ; print_str(hex_digit_char)
     ret
-print_hex:                              ; arg1: *num, arg2: size (bytes)
+_print_hex:                             ; arg1: *num, arg2: size (bytes)
     push rdx
     mov rdx, arg1                       ; rdx = arg1
     add arg1, arg2                      ; arg1 += arg2 - 1
